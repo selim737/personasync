@@ -1,0 +1,1 @@
+// Prompt viewer component placeholder
