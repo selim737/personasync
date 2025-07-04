@@ -1,24 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-function CustomFieldEditor() {
-  const [fields, setFields] = useState([]);
+function CustomFieldEditor({ fields, setFields }) {
   const [keyInput, setKeyInput] = useState('');
   const [valueInput, setValueInput] = useState('');
 
-  // Mock API'dan veri çekme simülasyonu
-  useEffect(() => {
-    const fetchDimensions = async () => {
-      // Sahte API cevabı
-      const mockData = [
-        { key: 'Language', value: 'English' },
-        { key: 'Tone', value: 'Friendly' },
-        { key: 'UseCase', value: 'Support Agent' }
-      ];
-      setFields(mockData);
-    };
-
-    fetchDimensions();
-  }, []);
+  const handleEdit = (index, newValue) => {
+    const updatedFields = [...fields];
+    updatedFields[index].value = newValue;
+    setFields(updatedFields);
+  };
 
   const addField = () => {
     if (keyInput.trim() && valueInput.trim()) {
@@ -26,12 +16,6 @@ function CustomFieldEditor() {
       setKeyInput('');
       setValueInput('');
     }
-  };
-
-  const handleEdit = (index, newValue) => {
-    const updatedFields = [...fields];
-    updatedFields[index].value = newValue;
-    setFields(updatedFields);
   };
 
   return (
