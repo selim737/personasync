@@ -1,29 +1,61 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 function CustomFieldEditor() {
   const [fields, setFields] = useState([]);
   const [keyInput, setKeyInput] = useState('');
   const [valueInput, setValueInput] = useState('');
 
-  const handleAddField = () => {
-    if (!keyInput || !valueInput) return;
+  // Mock API'dan veri çekme simülasyonu
+  useEffect(() => {
+    const fetchDimensions = async () => {
+      // Sahte API cevabı
+      const mockData = [
+        { key: 'Language', value: 'English' },
+        { key: 'Tone', value: 'Friendly' },
+        { key: 'UseCase', value: 'Support Agent' }
+      ];
+      setFields(mockData);
+    };
 
-    const newField = { key: keyInput, value: valueInput };
-    setFields([...fields, newField]);
-    setKeyInput('');
-    setValueInput('');
+    fetchDimensions();
+  }, []);
+
+  const addField = () => {
+    if (keyInput.trim() && valueInput.trim()) {
+      setFields([...fields, { key: keyInput, value: valueInput }]);
+      setKeyInput('');
+      setValueInput('');
+    }
+  };
+
+  const handleEdit = (index, newValue) => {
+    const updatedFields = [...fields];
+    updatedFields[index].value = newValue;
+    setFields(updatedFields);
   };
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div>
       <h2>Custom Field Editor</h2>
-      <div style={{ marginBottom: '10px' }}>
+      <ul>
+        {fields.map((field, index) => (
+          <li key={index}>
+            <strong>{field.key}:</strong>
+            <input
+              type="text"
+              value={field.value}
+              onChange={(e) => handleEdit(index, e.target.value)}
+              style={{ marginLeft: '10px' }}
+            />
+          </li>
+        ))}
+      </ul>
+      <div style={{ marginTop: '1rem' }}>
         <input
           type="text"
           placeholder="Field Name (key)"
           value={keyInput}
           onChange={(e) => setKeyInput(e.target.value)}
-          style={{ marginRight: '10px' }}
         />
         <input
           type="text"
@@ -31,18 +63,8 @@ function CustomFieldEditor() {
           value={valueInput}
           onChange={(e) => setValueInput(e.target.value)}
         />
-        <button onClick={handleAddField} style={{ marginLeft: '10px' }}>
-          Add
-        </button>
+        <button onClick={addField}>Add</button>
       </div>
-
-      <ul>
-        {fields.map((field, index) => (
-          <li key={index}>
-            <strong>{field.key}</strong>: {field.value}
-          </li>
-        ))}
-      </ul>
     </div>
   );
 }
