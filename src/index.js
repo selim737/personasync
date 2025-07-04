@@ -1,13 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import PromptViewer from './components/PromptViewer';
-import CustomFieldEditor from './components/CustomFieldEditor';
+import './index.css';
+import PersonaEditor from './PersonaEditor';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <div>
-    <PromptViewer />
-    <hr />
-    <CustomFieldEditor />
-  </div>
+  <React.StrictMode>
+    <PersonaEditor />
+  </React.StrictMode>
 );
