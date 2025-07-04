@@ -1,10 +1,13 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
-import PromptViewer from "./components/PromptViewer";
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import PromptViewer from './components/PromptViewer';
+import CustomFieldEditor from './components/CustomFieldEditor';
 
-const root = ReactDOM.createRoot(document.getElementById("root"));
+const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <React.StrictMode>
+  <div>
     <PromptViewer />
-  </React.StrictMode>
+    <hr />
+    <CustomFieldEditor />
+  </div>
 );
