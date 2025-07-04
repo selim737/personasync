@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 function CustomFieldEditor({ fields, setFields }) {
   const [keyInput, setKeyInput] = useState('');
