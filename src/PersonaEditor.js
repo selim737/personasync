@@ -1,10 +1,35 @@
 import { useState } from "react";
-import { Card, CardContent } from "./components/ui/card";
-import { Button } from "./components/ui/button";
-import { Input } from "./components/ui/input";
-import { Textarea } from "./components/ui/textarea";
 import YAML from "yaml";
-import CustomFieldEditor from "./components/CustomFieldEditor"; // bunu eklemeyi unutma!
+import CustomFieldEditor from "./components/CustomFieldEditor";
+
+// Sade bileşenler
+const Card = ({ children }) => (
+  <div style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '16px', marginBottom: '16px' }}>
+    {children}
+  </div>
+);
+
+const CardContent = ({ children }) => <div>{children}</div>;
+
+const Button = ({ children, onClick }) => (
+  <button onClick={onClick} style={{ margin: '4px', padding: '8px 12px' }}>
+    {children}
+  </button>
+);
+
+const Input = (props) => (
+  <input
+    {...props}
+    style={{ display: 'block', marginBottom: '8px', padding: '6px', width: '100%' }}
+  />
+);
+
+const Textarea = (props) => (
+  <textarea
+    {...props}
+    style={{ display: 'block', marginBottom: '8px', padding: '6px', width: '100%', minHeight: '60px' }}
+  />
+);
 
 export default function PersonaEditor() {
   const [persona, setPersona] = useState({
@@ -32,8 +57,6 @@ export default function PersonaEditor() {
   });
 
   const [prompt, setPrompt] = useState("");
-
-  // 👇 Buraya ekliyoruz: custom fields state
   const [customFields, setCustomFields] = useState([
     { key: "Language", value: "English" },
     { key: "Tone", value: "Friendly" },
@@ -110,10 +133,10 @@ export default function PersonaEditor() {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
-      <div className="space-y-4">
+    <div style={{ display: "flex", flexWrap: "wrap", gap: "20px", padding: "20px" }}>
+      <div style={{ flex: 1, minWidth: "300px" }}>
         <Card>
-          <CardContent className="space-y-2 p-4">
+          <CardContent>
             <Input type="file" accept=".json,.yaml,.yml" onChange={() => {}} />
             <Input placeholder="Full Name" value={persona.full_name} onChange={(e) => handleChange("full_name", e.target.value)} />
             <Input placeholder="Nickname" value={persona.nickname} onChange={(e) => handleChange("nickname", e.target.value)} />
@@ -128,28 +151,29 @@ export default function PersonaEditor() {
 
         <CustomFieldEditor fields={customFields} setFields={setCustomFields} />
 
-        <div className="flex flex-wrap gap-2">
+        <div>
           <Button onClick={exportJSON}>Export JSON</Button>
           <Button onClick={exportYAML}>Export YAML</Button>
           <Button onClick={exportMarkdown}>Export Markdown</Button>
         </div>
-        <Button variant="outline" onClick={generatePrompt}>Generate Prompt</Button>
+
+        <Button onClick={generatePrompt}>Generate Prompt</Button>
 
         {prompt && (
-          <Card className="mt-4">
-            <CardContent className="p-4">
-              <h3 className="font-bold mb-2">Generated Prompt:</h3>
-              <pre className="text-sm whitespace-pre-wrap">{prompt}</pre>
-              <Button className="mt-2" onClick={exportPrompt}>Download Prompt</Button>
+          <Card>
+            <CardContent>
+              <h3 style={{ fontWeight: "bold" }}>Generated Prompt:</h3>
+              <pre style={{ whiteSpace: "pre-wrap", fontSize: "12px" }}>{prompt}</pre>
+              <Button onClick={exportPrompt}>Download Prompt</Button>
             </CardContent>
           </Card>
         )}
       </div>
 
-      <div>
+      <div style={{ flex: 1, minWidth: "300px" }}>
         <Card>
-          <CardContent className="p-4">
-            <pre className="text-sm whitespace-pre-wrap">
+          <CardContent>
+            <pre style={{ whiteSpace: "pre-wrap", fontSize: "12px" }}>
               {JSON.stringify(persona, null, 2)}
             </pre>
           </CardContent>
