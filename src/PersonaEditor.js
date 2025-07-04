@@ -1,35 +1,5 @@
 import { useState } from "react";
-import YAML from "yaml";
 import CustomFieldEditor from "./components/CustomFieldEditor";
-
-// Sade bileşenler
-const Card = ({ children }) => (
-  <div style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '16px', marginBottom: '16px' }}>
-    {children}
-  </div>
-);
-
-const CardContent = ({ children }) => <div>{children}</div>;
-
-const Button = ({ children, onClick }) => (
-  <button onClick={onClick} style={{ margin: '4px', padding: '8px 12px' }}>
-    {children}
-  </button>
-);
-
-const Input = (props) => (
-  <input
-    {...props}
-    style={{ display: 'block', marginBottom: '8px', padding: '6px', width: '100%' }}
-  />
-);
-
-const Textarea = (props) => (
-  <textarea
-    {...props}
-    style={{ display: 'block', marginBottom: '8px', padding: '6px', width: '100%', minHeight: '60px' }}
-  />
-);
 
 export default function PersonaEditor() {
   const [persona, setPersona] = useState({
@@ -57,6 +27,7 @@ export default function PersonaEditor() {
   });
 
   const [prompt, setPrompt] = useState("");
+
   const [customFields, setCustomFields] = useState([
     { key: "Language", value: "English" },
     { key: "Tone", value: "Friendly" },
@@ -76,38 +47,6 @@ export default function PersonaEditor() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-  };
-
-  const exportJSON = () => {
-    const json = JSON.stringify(persona, null, 2);
-    downloadFile("persona.json", json);
-  };
-
-  const exportYAML = () => {
-    const yaml = YAML.stringify(persona);
-    downloadFile("persona.yaml", yaml);
-  };
-
-  const exportMarkdown = () => {
-    const md = `# AI Persona\n\n` +
-      `**Full Name:** ${persona.full_name}\n` +
-      `**Nickname:** ${persona.nickname}\n` +
-      `**Birth Year:** ${persona.birth_year}\n` +
-      `**Location:** ${persona.location.city}, ${persona.location.country}\n` +
-      `**Languages:** ${persona.languages}\n` +
-      `**Spouse:** ${persona.spouse}\n` +
-      `**Children:** ${persona.children}\n` +
-      `**Personality:** ${persona.personality}\n` +
-      `**Interests:** ${persona.interests}\n` +
-      `**Values:** ${persona.values}\n` +
-      `**Job Title:** ${persona.title}\n` +
-      `**Experience:** ${persona.experience_years} years\n` +
-      `**Current Company:** ${persona.current_company}\n` +
-      `**Responsibilities:** ${persona.responsibilities}\n` +
-      `**Working Style:** ${persona.working_style}\n` +
-      `**Preferred Tone:** ${persona.preferred_tone}\n` +
-      `**Tags:** ${persona.context_tags}`;
-    downloadFile("persona.md", md);
   };
 
   const exportPrompt = () => {
@@ -133,51 +72,98 @@ export default function PersonaEditor() {
   };
 
   return (
-    <div style={{ display: "flex", flexWrap: "wrap", gap: "20px", padding: "20px" }}>
-      <div style={{ flex: 1, minWidth: "300px" }}>
-        <Card>
-          <CardContent>
-            <Input type="file" accept=".json,.yaml,.yml" onChange={() => {}} />
-            <Input placeholder="Full Name" value={persona.full_name} onChange={(e) => handleChange("full_name", e.target.value)} />
-            <Input placeholder="Nickname" value={persona.nickname} onChange={(e) => handleChange("nickname", e.target.value)} />
-            <Input placeholder="Birth Year" value={persona.birth_year} onChange={(e) => handleChange("birth_year", e.target.value)} />
-            <Input placeholder="Country" value={persona.location.country} onChange={(e) => setPersona({ ...persona, location: { ...persona.location, country: e.target.value } })} />
-            <Input placeholder="City" value={persona.location.city} onChange={(e) => setPersona({ ...persona, location: { ...persona.location, city: e.target.value } })} />
-            <Input placeholder="Languages (comma separated)" value={persona.languages} onChange={(e) => handleChange("languages", e.target.value)} />
-            <Textarea placeholder="Interests (comma separated)" value={persona.interests} onChange={(e) => handleChange("interests", e.target.value)} />
-            <Textarea placeholder="Context Tags (comma separated)" value={persona.context_tags} onChange={(e) => handleChange("context_tags", e.target.value)} />
-          </CardContent>
-        </Card>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
+      <div className="space-y-4">
+        <h2 className="text-xl font-bold">Persona Creator</h2>
+        <input
+          placeholder="Full Name"
+          value={persona.full_name}
+          onChange={(e) => handleChange("full_name", e.target.value)}
+          className="border p-2 w-full"
+        />
+        <input
+          placeholder="Nickname"
+          value={persona.nickname}
+          onChange={(e) => handleChange("nickname", e.target.value)}
+          className="border p-2 w-full"
+        />
+        <input
+          placeholder="Birth Year"
+          value={persona.birth_year}
+          onChange={(e) => handleChange("birth_year", e.target.value)}
+          className="border p-2 w-full"
+        />
+        <input
+          placeholder="Country"
+          value={persona.location.country}
+          onChange={(e) =>
+            setPersona({
+              ...persona,
+              location: { ...persona.location, country: e.target.value }
+            })
+          }
+          className="border p-2 w-full"
+        />
+        <input
+          placeholder="City"
+          value={persona.location.city}
+          onChange={(e) =>
+            setPersona({
+              ...persona,
+              location: { ...persona.location, city: e.target.value }
+            })
+          }
+          className="border p-2 w-full"
+        />
+        <input
+          placeholder="Languages (comma separated)"
+          value={persona.languages}
+          onChange={(e) => handleChange("languages", e.target.value)}
+          className="border p-2 w-full"
+        />
+        <textarea
+          placeholder="Interests (comma separated)"
+          value={persona.interests}
+          onChange={(e) => handleChange("interests", e.target.value)}
+          className="border p-2 w-full"
+        />
+        <textarea
+          placeholder="Context Tags (comma separated)"
+          value={persona.context_tags}
+          onChange={(e) => handleChange("context_tags", e.target.value)}
+          className="border p-2 w-full"
+        />
 
         <CustomFieldEditor fields={customFields} setFields={setCustomFields} />
 
-        <div>
-          <Button onClick={exportJSON}>Export JSON</Button>
-          <Button onClick={exportYAML}>Export YAML</Button>
-          <Button onClick={exportMarkdown}>Export Markdown</Button>
-        </div>
-
-        <Button onClick={generatePrompt}>Generate Prompt</Button>
+        <button
+          onClick={generatePrompt}
+          className="bg-blue-500 text-white px-4 py-2 rounded"
+        >
+          Generate Prompt
+        </button>
 
         {prompt && (
-          <Card>
-            <CardContent>
-              <h3 style={{ fontWeight: "bold" }}>Generated Prompt:</h3>
-              <pre style={{ whiteSpace: "pre-wrap", fontSize: "12px" }}>{prompt}</pre>
-              <Button onClick={exportPrompt}>Download Prompt</Button>
-            </CardContent>
-          </Card>
+          <div className="mt-4">
+            <h3 className="font-semibold mb-2">Generated Prompt:</h3>
+            <pre className="bg-gray-100 p-2 rounded whitespace-pre-wrap text-sm">
+              {prompt}
+            </pre>
+            <button
+              onClick={exportPrompt}
+              className="mt-2 bg-green-500 text-white px-4 py-1 rounded"
+            >
+              Download Prompt
+            </button>
+          </div>
         )}
       </div>
 
-      <div style={{ flex: 1, minWidth: "300px" }}>
-        <Card>
-          <CardContent>
-            <pre style={{ whiteSpace: "pre-wrap", fontSize: "12px" }}>
-              {JSON.stringify(persona, null, 2)}
-            </pre>
-          </CardContent>
-        </Card>
+      <div className="bg-gray-50 p-4 rounded">
+        <h2 className="text-lg font-bold mb-2">Persona Preview (JSON)</h2>
+        <pre className="text-sm whitespace-pre-wrap">
+          {JSON.stringify(persona, null, 2)}
+        </pre>
       </div>
     </div>
   );
