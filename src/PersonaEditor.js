@@ -1,98 +1,183 @@
-import React, { useState } from 'react';
-import YAML from 'yaml';
+import React, { useState, useEffect } from "react";
+import YAML from "yaml";
+import { Card, CardContent } from "./components/ui/card";
+import { Input } from "./components/ui/input";
+import { Textarea } from "./components/ui/textarea";
+import { Button } from "./components/ui/button";
+import CustomFieldEditor from "./components/CustomFieldEditor";
 
-import { Card, CardContent } from './components/ui/card';
-import { Button } from './components/ui/button';
-import { Input } from './components/ui/input';
-import { Textarea } from './components/ui/textarea';
-import CustomFieldEditor from './components/CustomFieldEditor';
+const PersonaEditor = () => {
+  const [persona, setPersona] = useState({
+    name: "",
+    description: "",
+    languages: "",
+    spouse: "",
+    children: "",
+    personality: "",
+    interests: "",
+    values: "",
+    title: "",
+    experience_years: "",
+    current_company: "",
+    responsibilities: "",
+    working_style: "",
+    preferred_tone: "",
+    wants_humanity_convert: false,
+    hates_generic_answers: false,
+    allows_follow_up_questions: false,
+    custom_fields: {},
+  });
 
-const defaultPersona = {
-  name: '',
-  description: '',
-  languages: '',
-  spouse: '',
-  children: '',
-  personality: '',
-  interests: '',
-  values: '',
-  title: '',
-  experience_years: '',
-  current_company: '',
-  responsibilities: '',
-  working_style: '',
-  preferred_tone: '',
-  wants_humanity_convert: false,
-  hates_generic_answers: false,
-  allows_follow_up_questions: false,
-  custom_fields: {},
-};
+  const [yamlOutput, setYamlOutput] = useState("");
 
-export default function PersonaEditor() {
-  const [persona, setPersona] = useState(defaultPersona);
+  useEffect(() => {
+    const yamlData = YAML.stringify(persona);
+    setYamlOutput(yamlData);
+  }, [persona]);
 
   const handleChange = (field, value) => {
-    setPersona({ ...persona, [field]: value });
+    setPersona((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
   };
 
-  const handleCustomFieldsChange = (updatedFields) => {
-    setPersona({ ...persona, custom_fields: updatedFields });
+  const handleCheckboxChange = (field) => {
+    setPersona((prev) => ({
+      ...prev,
+      [field]: !prev[field],
+    }));
   };
 
   return (
-    <div style={{ display: 'flex', gap: '2rem', padding: '2rem' }}>
-      <div style={{ flex: 1 }}>
-        <Card>
-          <CardContent>
-            <h2>Edit Persona</h2>
-            {Object.keys(defaultPersona).map((key) => {
-              if (key === 'custom_fields') return null;
-              if (typeof defaultPersona[key] === 'boolean') {
-                return (
-                  <div key={key}>
-                    <label>
-                      <input
-                        type="checkbox"
-                        checked={persona[key]}
-                        onChange={(e) => handleChange(key, e.target.checked)}
-                      />{' '}
-                      {key.replaceAll('_', ' ')}
-                    </label>
-                  </div>
-                );
-              }
-              return (
-                <div key={key}>
-                  <label>{key.replaceAll('_', ' ')}</label>
-                  <Input
-                    value={persona[key]}
-                    onChange={(e) => handleChange(key, e.target.value)}
-                  />
-                </div>
-              );
-            })}
-            <CustomFieldEditor
-              fields={persona.custom_fields}
-              onChange={handleCustomFieldsChange}
-            />
-          </CardContent>
-        </Card>
-      </div>
-      <div style={{ flex: 1 }}>
-        <Card>
-          <CardContent>
-            <h2>Persona Preview</h2>
-            <Textarea
-              rows={30}
-              value={YAML.stringify(persona)}
-              readOnly
-            />
-            <Button onClick={() => navigator.clipboard.writeText(YAML.stringify(persona))}>
-              Copy to Clipboard
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
+    <div className="p-4 space-y-6 max-w-6xl mx-auto">
+      <Card>
+        <CardContent className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Input
+            placeholder="Name"
+            value={persona.name}
+            onChange={(e) => handleChange("name", e.target.value)}
+          />
+          <Input
+            placeholder="Languages"
+            value={persona.languages}
+            onChange={(e) => handleChange("languages", e.target.value)}
+          />
+          <Input
+            placeholder="Spouse"
+            value={persona.spouse}
+            onChange={(e) => handleChange("spouse", e.target.value)}
+          />
+          <Input
+            placeholder="Children"
+            value={persona.children}
+            onChange={(e) => handleChange("children", e.target.value)}
+          />
+          <Input
+            placeholder="Personality"
+            value={persona.personality}
+            onChange={(e) => handleChange("personality", e.target.value)}
+          />
+          <Input
+            placeholder="Interests"
+            value={persona.interests}
+            onChange={(e) => handleChange("interests", e.target.value)}
+          />
+          <Input
+            placeholder="Values"
+            value={persona.values}
+            onChange={(e) => handleChange("values", e.target.value)}
+          />
+          <Input
+            placeholder="Title"
+            value={persona.title}
+            onChange={(e) => handleChange("title", e.target.value)}
+          />
+          <Input
+            placeholder="Experience (Years)"
+            value={persona.experience_years}
+            onChange={(e) => handleChange("experience_years", e.target.value)}
+          />
+          <Input
+            placeholder="Current Company"
+            value={persona.current_company}
+            onChange={(e) => handleChange("current_company", e.target.value)}
+          />
+          <Input
+            placeholder="Responsibilities"
+            value={persona.responsibilities}
+            onChange={(e) => handleChange("responsibilities", e.target.value)}
+          />
+          <Input
+            placeholder="Working Style"
+            value={persona.working_style}
+            onChange={(e) => handleChange("working_style", e.target.value)}
+          />
+          <Input
+            placeholder="Preferred Tone"
+            value={persona.preferred_tone}
+            onChange={(e) => handleChange("preferred_tone", e.target.value)}
+          />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="p-4 space-y-4">
+          <Textarea
+            placeholder="Description"
+            value={persona.description}
+            onChange={(e) => handleChange("description", e.target.value)}
+          />
+
+          <div className="space-y-2">
+            <label className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                checked={persona.wants_humanity_convert}
+                onChange={() => handleCheckboxChange("wants_humanity_convert")}
+              />
+              <span>Wants Humanity Convert</span>
+            </label>
+            <label className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                checked={persona.hates_generic_answers}
+                onChange={() => handleCheckboxChange("hates_generic_answers")}
+              />
+              <span>Hates Generic Answers</span>
+            </label>
+            <label className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                checked={persona.allows_follow_up_questions}
+                onChange={() => handleCheckboxChange("allows_follow_up_questions")}
+              />
+              <span>Allows Follow Up Questions</span>
+            </label>
+          </div>
+
+          <CustomFieldEditor
+            customFields={persona.custom_fields}
+            setCustomFields={(newFields) =>
+              setPersona((prev) => ({ ...prev, custom_fields: newFields }))
+            }
+          />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="p-4">
+          <h2 className="font-semibold mb-2">Persona Preview</h2>
+          <Textarea
+            className="font-mono text-sm"
+            rows={20}
+            value={yamlOutput}
+            readOnly
+          />
+        </CardContent>
+      </Card>
     </div>
   );
-}
+};
+
+export default PersonaEditor;
