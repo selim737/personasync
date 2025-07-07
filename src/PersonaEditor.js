@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { Card, CardContent } from "./components/ui/card";
-import { Button } from "./components/ui/button";
-import { Input } from "./components/ui/input";
-import { Textarea } from "./components/ui/textarea";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import CustomFieldEditor from "./components/CustomFieldEditor";
 import YAML from "yaml";
 
@@ -32,7 +32,6 @@ export default function PersonaEditor() {
   });
 
   const [prompt, setPrompt] = useState("");
-
   const [customFields, setCustomFields] = useState([
     { key: "Language", value: "English" },
     { key: "Tone", value: "Friendly" },
@@ -120,33 +119,31 @@ export default function PersonaEditor() {
             <Input placeholder="Gender" value={persona.gender} onChange={(e) => handleChange("gender", e.target.value)} />
             <Input placeholder="Country" value={persona.location.country} onChange={(e) => setPersona({ ...persona, location: { ...persona.location, country: e.target.value } })} />
             <Input placeholder="City" value={persona.location.city} onChange={(e) => setPersona({ ...persona, location: { ...persona.location, city: e.target.value } })} />
-            <Input placeholder="Languages" value={persona.languages} onChange={(e) => handleChange("languages", e.target.value)} />
+            <Input placeholder="Languages (comma separated)" value={persona.languages} onChange={(e) => handleChange("languages", e.target.value)} />
             <Input placeholder="Spouse" value={persona.spouse} onChange={(e) => handleChange("spouse", e.target.value)} />
             <Input placeholder="Children" value={persona.children} onChange={(e) => handleChange("children", e.target.value)} />
             <Textarea placeholder="Personality" value={persona.personality} onChange={(e) => handleChange("personality", e.target.value)} />
-            <Textarea placeholder="Interests" value={persona.interests} onChange={(e) => handleChange("interests", e.target.value)} />
+            <Textarea placeholder="Interests (comma separated)" value={persona.interests} onChange={(e) => handleChange("interests", e.target.value)} />
             <Textarea placeholder="Values" value={persona.values} onChange={(e) => handleChange("values", e.target.value)} />
-            <Input placeholder="Title" value={persona.title} onChange={(e) => handleChange("title", e.target.value)} />
-            <Input placeholder="Experience Years" value={persona.experience_years} onChange={(e) => handleChange("experience_years", e.target.value)} />
+            <Input placeholder="Job Title" value={persona.title} onChange={(e) => handleChange("title", e.target.value)} />
+            <Input placeholder="Experience (years)" value={persona.experience_years} onChange={(e) => handleChange("experience_years", e.target.value)} />
             <Input placeholder="Current Company" value={persona.current_company} onChange={(e) => handleChange("current_company", e.target.value)} />
             <Textarea placeholder="Responsibilities" value={persona.responsibilities} onChange={(e) => handleChange("responsibilities", e.target.value)} />
-            <Textarea placeholder="Working Style" value={persona.working_style} onChange={(e) => handleChange("working_style", e.target.value)} />
+            <Input placeholder="Working Style" value={persona.working_style} onChange={(e) => handleChange("working_style", e.target.value)} />
             <Input placeholder="Preferred Tone" value={persona.preferred_tone} onChange={(e) => handleChange("preferred_tone", e.target.value)} />
-            <Input placeholder="Context Tags" value={persona.context_tags} onChange={(e) => handleChange("context_tags", e.target.value)} />
-
-            {/* Checkbox Fields */}
-            <div className="flex items-center gap-2 mt-2">
+            <Textarea placeholder="Context Tags (comma separated)" value={persona.context_tags} onChange={(e) => handleChange("context_tags", e.target.value)} />
+            <label className="flex items-center space-x-2">
               <input type="checkbox" checked={persona.wants_humanity_convert} onChange={(e) => handleChange("wants_humanity_convert", e.target.checked)} />
-              <label>Wants Humanity Convert</label>
-            </div>
-            <div className="flex items-center gap-2">
+              <span>Wants Humanity Convert</span>
+            </label>
+            <label className="flex items-center space-x-2">
               <input type="checkbox" checked={persona.hates_generic_answers} onChange={(e) => handleChange("hates_generic_answers", e.target.checked)} />
-              <label>Hates Generic Answers</label>
-            </div>
-            <div className="flex items-center gap-2">
+              <span>Hates Generic Answers</span>
+            </label>
+            <label className="flex items-center space-x-2">
               <input type="checkbox" checked={persona.allows_follow_up_questions} onChange={(e) => handleChange("allows_follow_up_questions", e.target.checked)} />
-              <label>Allows Follow Up Questions</label>
-            </div>
+              <span>Allows Follow Up Questions</span>
+            </label>
           </CardContent>
         </Card>
 
@@ -157,6 +154,7 @@ export default function PersonaEditor() {
           <Button onClick={exportYAML}>Export YAML</Button>
           <Button onClick={exportMarkdown}>Export Markdown</Button>
         </div>
+
         <Button variant="outline" onClick={generatePrompt}>Generate Prompt</Button>
 
         {prompt && (
@@ -173,7 +171,7 @@ export default function PersonaEditor() {
       <div>
         <Card>
           <CardContent className="p-4">
-            <h3 className="font-semibold mb-2">Persona Preview</h3>
+            <h3 className="font-bold mb-2">Persona Preview</h3>
             <pre className="text-sm whitespace-pre-wrap">
               {JSON.stringify(persona, null, 2)}
             </pre>
