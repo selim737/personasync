@@ -1,5 +1,5 @@
 import React from 'react';
-import PersonaEditor from './PersonaEditor';
+import PersonaEditor from './components/PersonaEditor';
 
 function App() {
   return (
