@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import YAML from "yaml";
 
 export default function PersonaEditor() {
@@ -23,118 +23,189 @@ export default function PersonaEditor() {
     wants_humanity_convert: true,
     hates_generic_answers: true,
     allows_follow_up_questions: true,
-    context_tags: ""
+    context_tags: "",
   });
 
-  const [customFields, setCustomFields] = useState([
-    { key: "Language", value: "English" },
-    { key: "Tone", value: "Friendly" },
-    { key: "UseCase", value: "Support Agent" }
-  ]);
+  const [customFields, setCustomFields] = useState({
+    language: "English",
+    tone: "Friendly",
+    useCase: "Support Agent",
+  });
+
   const [newKey, setNewKey] = useState("");
   const [newValue, setNewValue] = useState("");
   const [prompt, setPrompt] = useState("");
 
-  const handleChange = (key, value) => {
-    setPersona({ ...persona, [key]: value });
-  };
-
-  const downloadFile = (filename, content) => {
-    const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", filename);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
-  const exportJSON = () => {
-    const json = JSON.stringify(persona, null, 2);
-    downloadFile("persona.json", json);
-  };
-
-  const exportYAML = () => {
-    const yaml = YAML.stringify(persona);
-    downloadFile("persona.yaml", yaml);
-  };
-
-  const exportMarkdown = () => {
-    const md = `# AI Persona\n\n` +
-      `**Full Name:** ${persona.full_name}\n` +
-      `**Nickname:** ${persona.nickname}\n` +
-      `**Birth Year:** ${persona.birth_year}\n` +
-      `**Location:** ${persona.location.city}, ${persona.location.country}\n` +
-      `**Languages:** ${persona.languages}\n` +
-      `**Spouse:** ${persona.spouse}\n` +
-      `**Children:** ${persona.children}\n` +
-      `**Personality:** ${persona.personality}\n` +
-      `**Interests:** ${persona.interests}\n` +
-      `**Values:** ${persona.values}\n` +
-      `**Job Title:** ${persona.title}\n` +
-      `**Experience:** ${persona.experience_years} years\n` +
-      `**Current Company:** ${persona.current_company}\n` +
-      `**Responsibilities:** ${persona.responsibilities}\n` +
-      `**Working Style:** ${persona.working_style}\n` +
-      `**Preferred Tone:** ${persona.preferred_tone}\n` +
-      `**Tags:** ${persona.context_tags}`;
-    downloadFile("persona.md", md);
-  };
-
-  const exportPrompt = () => {
-    if (prompt) {
-      downloadFile("ai_prompt.txt", prompt);
+  const updateField = (key, value) => {
+    if (key.startsWith("location.")) {
+      const locKey = key.split(".")[1];
+      setPersona((prev) => ({
+        ...prev,
+        location: { ...prev.location, [locKey]: value },
+      }));
+    } else {
+      setPersona((prev) => ({ ...prev, [key]: value }));
     }
   };
 
+  const addField = () => {
+    if (!newKey) return;
+    setPersona((prev) => ({ ...prev, [newKey]: newValue }));
+    setNewKey("");
+    setNewValue("");
+  };
+
   const generatePrompt = () => {
-    const promptText = `You are now assisting ${persona.full_name} (${persona.nickname}).\n` +
-      `They are an experienced ${persona.title} working at ${persona.current_company}.\n` +
-      `They live in ${persona.location.city}, ${persona.location.country} and speak ${persona.languages}.\n` +
-      `Interests include: ${persona.interests}.\n` +
-      `They value: ${persona.values}.\n` +
-      `Preferred tone: ${persona.preferred_tone}.\n` +
-      `Please be ${persona.wants_humanity_convert ? "natural and human-like" : "formal"}, ` +
-      `${persona.hates_generic_answers ? "avoid generic replies" : "generic replies are fine"}, ` +
-      `${persona.allows_follow_up_questions ? "and feel free to ask clarifying questions." : "don't ask follow-ups."}` +
-      `\n\nCustom Fields:\n` +
-      customFields.map(field => `- ${field.key}: ${field.value}`).join("\n");
+    const {
+      full_name,
+      nickname,
+      birth_year,
+      gender,
+      location,
+      languages,
+      spouse,
+      children,
+      personality,
+      interests,
+      values,
+      title,
+      experience_years,
+      current_company,
+      responsibilities,
+      working_style,
+      preferred_tone,
+      wants_humanity_convert,
+      hates_generic_answers,
+      allows_follow_up_questions,
+      context_tags,
+    } = persona;
+
+    const { language, tone, useCase } = customFields;
+
+    const promptText = `You are now assisting ${full_name || nickname || "a user"}.
+They are an experienced ${title || "professional"} working at ${
+      current_company || "a company"
+    }. They live in ${location?.city || "a city"}, ${
+      location?.country || "a country"
+    } and speak ${languages || "a language"}.
+Interests include: ${interests || "various topics"}.
+They value: ${values || "important principles"}.
+Preferred tone: ${preferred_tone || tone}.
+
+Please be natural and human-like, avoid generic replies, and feel free to ask clarifying questions.
+
+Custom Fields:
+- Language: ${language}
+- Tone: ${tone}
+- UseCase: ${useCase}`;
 
     setPrompt(promptText);
   };
 
-  const addField = () => {
-    if (newKey && newValue) {
-      setCustomFields([...customFields, { key: newKey, value: newValue }]);
-      setNewKey("");
-      setNewValue("");
-    }
+  const exportJSON = () => {
+    const blob = new Blob([JSON.stringify(persona, null, 2)], {
+      type: "application/json",
+    });
+    downloadBlob(blob, "persona.json");
+  };
+
+  const exportYAML = () => {
+    const yamlData = YAML.stringify(persona);
+    const blob = new Blob([yamlData], { type: "text/yaml" });
+    downloadBlob(blob, "persona.yaml");
+  };
+
+  const exportMarkdown = () => {
+    const markdown = Object.entries(persona)
+      .map(([key, value]) => `- **${key}**: ${JSON.stringify(value)}`)
+      .join("\n");
+    const blob = new Blob([markdown], { type: "text/markdown" });
+    downloadBlob(blob, "persona.md");
+  };
+
+  const exportPrompt = () => {
+    const blob = new Blob([prompt], { type: "text/plain" });
+    downloadBlob(blob, "persona_prompt.txt");
+  };
+
+  const downloadBlob = (blob, filename) => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Persona Creator</h1>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <input placeholder="Full Name" value={persona.full_name} onChange={(e) => handleChange("full_name", e.target.value)} />
-        <input placeholder="Nickname" value={persona.nickname} onChange={(e) => handleChange("nickname", e.target.value)} />
-        <input placeholder="Birth Year" value={persona.birth_year} onChange={(e) => handleChange("birth_year", e.target.value)} />
-        <input placeholder="Country" value={persona.location.country} onChange={(e) => setPersona({ ...persona, location: { ...persona.location, country: e.target.value } })} />
-        <input placeholder="City" value={persona.location.city} onChange={(e) => setPersona({ ...persona, location: { ...persona.location, city: e.target.value } })} />
-        <input placeholder="Languages (comma separated)" value={persona.languages} onChange={(e) => handleChange("languages", e.target.value)} />
-        <textarea placeholder="Interests (comma separated)" value={persona.interests} onChange={(e) => handleChange("interests", e.target.value)} />
-        <textarea placeholder="Context Tags (comma separated)" value={persona.context_tags} onChange={(e) => handleChange("context_tags", e.target.value)} />
+    <div style={{ padding: "2rem", fontFamily: "sans-serif" }}>
+      <h1>Persona Creator</h1>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+          gap: "0.5rem",
+          marginBottom: "2rem",
+        }}
+      >
+        {[
+          "full_name",
+          "nickname",
+          "birth_year",
+          "location.country",
+          "location.city",
+          "languages",
+          "interests",
+          "context_tags",
+        ].map((field) => (
+          <input
+            key={field}
+            placeholder={field
+              .replace("location.", "")
+              .replace(/_/g, " ")
+              .replace(/\b\w/g, (c) => c.toUpperCase())}
+            value={
+              field.startsWith("location.")
+                ? persona.location[field.split(".")[1]]
+                : persona[field] || ""
+            }
+            onChange={(e) => updateField(field, e.target.value)}
+          />
+        ))}
       </div>
 
-      <h2 className="text-xl font-semibold mb-2">Custom Field Editor</h2>
-      <ul className="mb-2">
-        {customFields.map((field, index) => (
-          <li key={index}><strong>{field.key}:</strong> {field.value}</li>
-        ))}
+      <h2>Custom Field Editor</h2>
+      <ul>
+        <li>
+          <strong>Language:</strong>{" "}
+          <input
+            value={customFields.language}
+            onChange={(e) =>
+              setCustomFields({ ...customFields, language: e.target.value })
+            }
+          />
+        </li>
+        <li>
+          <strong>Tone:</strong>{" "}
+          <input
+            value={customFields.tone}
+            onChange={(e) =>
+              setCustomFields({ ...customFields, tone: e.target.value })
+            }
+          />
+        </li>
+        <li>
+          <strong>UseCase:</strong>{" "}
+          <input
+            value={customFields.useCase}
+            onChange={(e) =>
+              setCustomFields({ ...customFields, useCase: e.target.value })
+            }
+          />
+        </li>
       </ul>
 
-      <div className="flex gap-2 mb-4">
+      <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1rem" }}>
         <input
           placeholder="Field Name (key)"
           value={newKey}
@@ -148,25 +219,24 @@ export default function PersonaEditor() {
         <button onClick={addField}>Add</button>
       </div>
 
-      <button onClick={generatePrompt} className="mb-4">Generate Prompt</button>
+      <button onClick={generatePrompt}>Generate Prompt</button>
 
-      <h2 className="text-xl font-semibold mb-2">Persona Preview (JSON)</h2>
-      <pre className="bg-gray-100 p-2 text-sm">{JSON.stringify(persona, null, 2)}</pre>
+      <h2 style={{ marginTop: "2rem" }}>Persona Preview (JSON)</h2>
+      <pre>{JSON.stringify(persona, null, 2)}</pre>
 
       {prompt && (
-        <div className="mt-4">
-          <h3 className="font-bold mb-1">Generated Prompt:</h3>
-          <pre className="bg-gray-100 p-2 text-sm whitespace-pre-wrap">{prompt}</pre>
+        <div>
+          <h2>Generated Prompt:</h2>
+          <pre>{prompt}</pre>
           <button onClick={exportPrompt}>Download Prompt</button>
         </div>
       )}
 
-      <div className="flex gap-2 mt-4">
+      <div style={{ display: "flex", gap: "0.5rem", marginTop: "1rem" }}>
         <button onClick={exportJSON}>Export JSON</button>
         <button onClick={exportYAML}>Export YAML</button>
         <button onClick={exportMarkdown}>Export Markdown</button>
       </div>
     </div>
   );
-} 
-
+}
