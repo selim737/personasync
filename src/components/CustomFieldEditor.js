@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import React from 'react';
 import { Card, CardContent } from "./ui/card";
 
 function CustomFieldEditor({ fields, setFields }) {
