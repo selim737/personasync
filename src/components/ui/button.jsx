@@ -1,3 +1,4 @@
+import React from 'react';
 export function Button({ children, onClick, className = "", variant = "default" }) {
   const base = "px-4 py-2 rounded text-white";
   const variants = {
